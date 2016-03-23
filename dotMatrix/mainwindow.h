@@ -25,6 +25,7 @@ public:
     explicit MainWindow(QWidget *parent = 0);
     ~MainWindow();
 
+    void matrixInit();
 private slots:
     void on_lineEditValue_returnPressed();
     void on_pushButton_clicked();

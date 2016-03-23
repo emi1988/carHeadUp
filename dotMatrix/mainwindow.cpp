@@ -15,13 +15,25 @@
 
 uint8_t buf[2];
 
+void MainWindow::matrixInit()
+{
+    spi(MAX7219_REG_SHUTDOWN, 0);
+    spi(MAX7219_REG_SCANLIMIT, 7);    // show all 8 digits
+    spi(MAX7219_REG_DECODEMODE, 0);   // use matrix (not digits)
+    spi(MAX7219_REG_DISPLAYTEST, 0);  // no display test
+    spi(MAX7219_REG_SHUTDOWN, 1);
+}
+
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
 
+    //init the font for displaying the numbers
     initFont();
+    //matrix init
+    matrixInit();
 
 //    uint8_t on[] = { 0xFF, 0xFF };
 //    uint8_t off[] = { 0xFF, 0x00 };
@@ -37,26 +49,8 @@ MainWindow::MainWindow(QWidget *parent) :
 //    memcpy(buf, initSettings ,8);
     //    wiringPiSPIDataRW(CHANNEL, buf, 8);
 
-    //matrix init
-    spi(MAX7219_REG_SHUTDOWN, 0);
-    spi(MAX7219_REG_SCANLIMIT, 7);    // show all 8 digits
-    spi(MAX7219_REG_DECODEMODE, 0);   // use matrix (not digits)
-    spi(MAX7219_REG_DISPLAYTEST, 0);  // no display test
-    spi(MAX7219_REG_SHUTDOWN, 1);
 
-    clear();
 
-    displayNumber(23);
-    clear();
-    displayNumber(45);
-    clear();
-    displayNumber(67);
-    clear();
-    displayNumber(78);
-    clear();
-    displayNumber(89);
-    clear();
-    displayNumber(42);
     clear();
 
 

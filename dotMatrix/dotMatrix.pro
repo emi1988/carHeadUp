@@ -6,6 +6,11 @@
 
 QT       += core gui
 
+#for qt5 or greater use :
+#QT += serialport
+
+CONFIG += serialport
+
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
 TARGET = dotMatrix
@@ -13,10 +18,12 @@ TEMPLATE = app
 
 
 SOURCES += main.cpp\
-        mainwindow.cpp
+        mainwindow.cpp \
+    gpsmanager.cpp
 
 HEADERS  += mainwindow.h \
-    myDefs.h
+    myDefs.h \
+    gpsmanager.h
 
 FORMS    += mainwindow.ui
 
