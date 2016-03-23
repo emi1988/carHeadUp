@@ -27,8 +27,13 @@ public:
 
 private slots:
     void on_lineEditValue_returnPressed();
-
     void on_pushButton_clicked();
+
+    void displayNumber(int number);
+
+    void on_lineEditNumber_returnPressed();
+
+    void on_horizontalSlider_sliderMoved(int position);
 
 private:
     Ui::MainWindow *ui;
@@ -36,6 +41,7 @@ private:
     void clear();
     int binToDec(QString bin);
     void initFont();
+
 
     QHash<int, QStringList> m_numberHash;
 };

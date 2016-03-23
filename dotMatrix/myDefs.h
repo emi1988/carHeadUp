@@ -21,9 +21,6 @@ typedef enum enMax7219
 };
 
 
-
-
-
 typedef struct stNumber3x5
 {
     QString reg1;
@@ -31,7 +28,6 @@ typedef struct stNumber3x5
     QString reg3;
     QString reg4;
     QString reg5;
-
 };
 
 #endif // DEFS_H

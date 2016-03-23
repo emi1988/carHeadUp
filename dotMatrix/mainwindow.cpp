@@ -21,9 +21,11 @@ MainWindow::MainWindow(QWidget *parent) :
 {
     ui->setupUi(this);
 
-    uint8_t on[] = { 0xFF, 0xFF };
-    uint8_t off[] = { 0xFF, 0x00 };
-    uint8_t buf[2];
+    initFont();
+
+//    uint8_t on[] = { 0xFF, 0xFF };
+//    uint8_t off[] = { 0xFF, 0x00 };
+//    uint8_t buf[2];
 
     if (wiringPiSPISetup(CHANNEL, 1000000) < 0) {
             fprintf (stderr, "SPI Setup failed: %s\n", strerror (errno));
@@ -44,9 +46,23 @@ MainWindow::MainWindow(QWidget *parent) :
 
     clear();
 
-    spi(8, binToDec("0101") );
-    spi(7, binToDec("1011") );
-    spi(6, binToDec("1101") );
+    displayNumber(23);
+    clear();
+    displayNumber(45);
+    clear();
+    displayNumber(67);
+    clear();
+    displayNumber(78);
+    clear();
+    displayNumber(89);
+    clear();
+    displayNumber(42);
+    clear();
+
+
+//    spi(8, binToDec("0101") );
+//    spi(7, binToDec("1011") );
+//    spi(6, binToDec("1101") );
 
     //    spi(0x0B,0x07);
 //    spi(0x09,0x00);
@@ -114,99 +130,95 @@ void MainWindow::initFont()
 {
     QStringList tmpNumber;
 
-
     //1:
-         tmpNumber.append(010);
-         tmpNumber.append(110);
-         tmpNumber.append(010);
-         tmpNumber.append(010);
-         tmpNumber.append(111);
+         tmpNumber.append("010");
+         tmpNumber.append("110");
+         tmpNumber.append("010");
+         tmpNumber.append("010");
+         tmpNumber.append("111");
          m_numberHash.insert(1, tmpNumber);
          tmpNumber.clear();
 
         //2:
-         tmpNumber.append(010);
-         tmpNumber.append(101);
-         tmpNumber.append(001);
-         tmpNumber.append(010);
-         tmpNumber.append(111);
-         m_numberHash.insert(1, tmpNumber);
+         tmpNumber.append("010");
+         tmpNumber.append("101");
+         tmpNumber.append("001");
+         tmpNumber.append("010");
+         tmpNumber.append("111");
+         m_numberHash.insert(2, tmpNumber);
          tmpNumber.clear();
 
         //3:
-         tmpNumber.append(111);
-         tmpNumber.append(001);
-         tmpNumber.append(011);
-         tmpNumber.append(001);
-         tmpNumber.append(111);
-         m_numberHash.insert(1, tmpNumber);
+         tmpNumber.append("111");
+         tmpNumber.append("001");
+         tmpNumber.append("011");
+         tmpNumber.append("001");
+         tmpNumber.append("111");
+         m_numberHash.insert(3, tmpNumber);
          tmpNumber.clear();
 
         //4:
-         tmpNumber.append(101);
-         tmpNumber.append(101);
-         tmpNumber.append(111);
-         tmpNumber.append(001);
-         tmpNumber.append(001);
-         m_numberHash.insert(1, tmpNumber);
+         tmpNumber.append("101");
+         tmpNumber.append("101");
+         tmpNumber.append("111");
+         tmpNumber.append("001");
+         tmpNumber.append("001");
+         m_numberHash.insert(4, tmpNumber);
          tmpNumber.clear();
 
         //5:
-         tmpNumber.append(111);
-         tmpNumber.append(100);
-         tmpNumber.append(111);
-         tmpNumber.append(001);
-         tmpNumber.append(111);
-         m_numberHash.insert(1, tmpNumber);
+         tmpNumber.append("111");
+         tmpNumber.append("100");
+         tmpNumber.append("111");
+         tmpNumber.append("001");
+         tmpNumber.append("111");
+         m_numberHash.insert(5, tmpNumber);
          tmpNumber.clear();
 
         //6:
-         tmpNumber.append(111);
-         tmpNumber.append(100);
-         tmpNumber.append(111);
-         tmpNumber.append(101);
-         tmpNumber.append(111);
-         m_numberHash.insert(1, tmpNumber);
+         tmpNumber.append("111");
+         tmpNumber.append("100");
+         tmpNumber.append("111");
+         tmpNumber.append("101");
+         tmpNumber.append("111");
+         m_numberHash.insert(6, tmpNumber);
          tmpNumber.clear();
 
         //7:
-         tmpNumber.append(111);
-         tmpNumber.append(001);
-         tmpNumber.append(010);
-         tmpNumber.append(100);
-         tmpNumber.append(100);
-         m_numberHash.insert(1, tmpNumber);
+         tmpNumber.append("111");
+         tmpNumber.append("001");
+         tmpNumber.append("010");
+         tmpNumber.append("100");
+         tmpNumber.append("100");
+         m_numberHash.insert(7, tmpNumber);
          tmpNumber.clear();
 
         //8:
-         tmpNumber.append(111);
-         tmpNumber.append(101);
-         tmpNumber.append(111);
-         tmpNumber.append(101);
-         tmpNumber.append(111);
+         tmpNumber.append("111");
+         tmpNumber.append("101");
+         tmpNumber.append("111");
+         tmpNumber.append("101");
+         tmpNumber.append("111");
          m_numberHash.insert(8, tmpNumber);
          tmpNumber.clear();
 
         //9:
-         tmpNumber.append(111);
-         tmpNumber.append(101);
-         tmpNumber.append(111);
-         tmpNumber.append(001);
-         tmpNumber.append(111);
+         tmpNumber.append("111");
+         tmpNumber.append("101");
+         tmpNumber.append("111");
+         tmpNumber.append("001");
+         tmpNumber.append("111");
          m_numberHash.insert(9, tmpNumber);
          tmpNumber.clear();
 
         //0:
-         tmpNumber.append(111);
-         tmpNumber.append(101);
-         tmpNumber.append(101);
-         tmpNumber.append(101);
-         tmpNumber.append(111);
+         tmpNumber.append("111");
+         tmpNumber.append("101");
+         tmpNumber.append("101");
+         tmpNumber.append("101");
+         tmpNumber.append("111");
          m_numberHash.insert(0, tmpNumber);
          tmpNumber.clear();
-
-
-
 
 }
 
@@ -224,4 +236,50 @@ void MainWindow::on_lineEditValue_returnPressed()
 void MainWindow::on_pushButton_clicked()
 {
     clear();
+}
+
+void MainWindow::displayNumber(int number)
+{
+
+    if(number>=10 & number<100)
+    {
+         int number1 = QString::number(number).left(1).toInt();
+         int number2 = QString::number(number).right(1).toInt();
+
+         QStringList currentBinaryNumber1 = m_numberHash.value(number1);
+         QStringList currentBinaryNumber2 = m_numberHash.value(number2);
+
+         spi(8, binToDec(currentBinaryNumber1.at(0)+"0" +currentBinaryNumber2.at(0)));
+         spi(7, binToDec(currentBinaryNumber1.at(1)+"0" +currentBinaryNumber2.at(1)));
+         spi(6, binToDec(currentBinaryNumber1.at(2)+"0" +currentBinaryNumber2.at(2)));
+         spi(5, binToDec(currentBinaryNumber1.at(3)+"0" +currentBinaryNumber2.at(3)));
+         spi(4, binToDec(currentBinaryNumber1.at(4)+"0" +currentBinaryNumber2.at(4)));
+
+    }
+    else if (number<10)
+    {
+        QStringList currentBinaryNumber = m_numberHash.value(number);
+
+        spi(8, binToDec(currentBinaryNumber.at(0)));
+        spi(7, binToDec(currentBinaryNumber.at(1)));
+        spi(6, binToDec(currentBinaryNumber.at(2)));
+        spi(5, binToDec(currentBinaryNumber.at(3)));
+        spi(4, binToDec(currentBinaryNumber.at(4)));
+    }
+    else if(number >=100)
+    {
+        //not implemented jet; waiting for second dot-matrix :)
+    }
+
+}
+
+void MainWindow::on_lineEditNumber_returnPressed()
+{
+    displayNumber(ui->lineEditNumber->text().toInt());
+}
+
+void MainWindow::on_horizontalSlider_sliderMoved(int position)
+{
+    displayNumber(position);
+    ui->lineEditNumber->setText(QString::number(position));
 }
