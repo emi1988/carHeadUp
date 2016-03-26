@@ -2,7 +2,7 @@
 #define DEFS_H
 
 
-typedef enum enMax7219
+enum enMax7219
 {
     MAX7219_REG_NOOP = 0x0,
     MAX7219_REG_DIGIT0 = 0x1,
@@ -21,7 +21,7 @@ typedef enum enMax7219
 };
 
 
-typedef struct stNumber3x5
+struct stNumber3x5
 {
     QString reg1;
     QString reg2;

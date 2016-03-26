@@ -23,7 +23,8 @@ SOURCES += main.cpp\
 
 HEADERS  += mainwindow.h \
     myDefs.h \
-    gpsmanager.h
+    gpsmanager.h \
+    defsGps.h
 
 FORMS    += mainwindow.ui
 

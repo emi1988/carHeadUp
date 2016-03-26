@@ -1,9 +1,18 @@
 #include "gpsmanager.h"
 
-gpsManager::gpsManager()
-{
+#include <QDebug>
+#include <QtSerialPort/QSerialPort>
+#include <QtSerialPort/QSerialPortInfo>
+#include <QDir>
+#include <QTimer>
 
-      m_serialPort = new QSerialPort(this);
+gpsManager::gpsManager(int secondsBetweenData)
+{
+    m_secondsBetweenData = secondsBetweenData;
+
+    m_lastSendetTime = QDateTime::currentDateTime().toMSecsSinceEpoch()/1000;
+
+    m_serialPort = new QSerialPort(this);
 
       //connect to gps-receiver
       if(getSerialPortSettings() == true)
@@ -17,6 +26,7 @@ gpsManager::gpsManager()
 
 
 }
+
 
 bool gpsManager::getSerialPortSettings()
 {
@@ -32,10 +42,6 @@ bool gpsManager::getSerialPortSettings()
                 qDebug() <<"GPS-receiver found on port:" << info.portName();
                 qDebug() << "description: " << info.description();
                 qDebug() << "manufacturer: " << info.manufacturer();
-
-                ui->textEditOutput->append("GPS-receiver found on port:" + info.portName());
-                ui->textEditOutput->append("description: " + info.description());
-                ui->textEditOutput->append("manufacturer: " + info.manufacturer());
 
                 break;
             }
@@ -55,7 +61,6 @@ bool gpsManager::getSerialPortSettings()
     else
     {
         qDebug() << "GPS-receiver not found ): ";
-        ui->textEditOutput->append( "GPS-receiver not found ): ");
     }
 
         return foundGPSreceiver;
@@ -76,13 +81,11 @@ bool gpsManager::openSerialPort()
      if (m_serialPort->open(QIODevice::ReadWrite))
      {
          qDebug()<<"serial port successfully opened";
-         ui->textEditOutput->append("serial port successfully opened");
          return true;
      }
      else
      {
          qDebug()<<"could not open serial port ): ";
-         ui->textEditOutput->append("could not open serial port ): ");
 
          return false;
      }
@@ -96,5 +99,68 @@ void gpsManager::handleError(QSerialPort::SerialPortError error)
 
 void gpsManager::serialDataReceived()
 {
-    //TODO: copy from gspCar-Project and modify to get the speed
+    QString currentReceivedData = QString(m_serialPort->readAll());
+
+    //add the buffered data from the last receive run
+    currentReceivedData.prepend(m_receiveBuffer);
+
+    //search for the start-character "$"
+    QStringList currentGPSsentences = currentReceivedData.split("$");
+    //save the last incomplete part in the buffer
+    m_receiveBuffer.clear();
+    m_receiveBuffer.append(currentGPSsentences.last());
+    //remove the last incomplete sentence from the buffer
+    currentGPSsentences.removeLast();
+
+    //go through all sentences
+
+    foreach (QString currentSentence, currentGPSsentences)
+    {
+        QStringList singleSentenceData = currentSentence.split(",");
+
+        //just use the GPGGA-Information and check if it's already received completely
+        if((singleSentenceData.at(0).compare("GPRMC")== 0) & (singleSentenceData.count() == 13))
+        {
+
+            //just save/send the gps-data if the m_msecondsBetweenWebSend is over
+            quint64 currentTime = QDateTime::currentDateTime().toMSecsSinceEpoch()/1000;
+
+            if(currentTime > (m_lastSendetTime + m_secondsBetweenData) )
+            {
+                m_lastSendetTime = currentTime;
+
+                QStringList singleSentenceData = currentSentence.split(",");
+                qDebug() << "GPGGA-Data: " << singleSentenceData;
+
+
+                qDebug() << "RapiTimestamp: " << currentTime;
+
+                //GPGGA-Data:  ("GPGGA", "213225.936", "", "", "", "", "0", "00", "", "", "M", "0.0", "M", "", "0000*5F ")
+                //$GPRMC,191410,A,4735.5634,N,00739.3538,E,0.0,0.0,181102,0.4,E,A*19
+
+                //check if received data is empty because of no gps-signal
+                QString testData = singleSentenceData.at(3);
+                if(testData.compare("") == 0)
+                {
+                    qDebug() << "gps-data is empty";
+
+                }
+                else
+                {
+                    //gps-data is not empty -> process it
+
+                    float speedKmh = singleSentenceData.at(7).toFloat()*1.852;
+
+                    qDebug() << "speed (km//h): " << speedKmh;
+
+                    emit speedAviable((int) speedKmh);
+
+
+                }
+            }
+        }
+    }
+
+    //qDebug() << currentGPSsentences;
+
 }

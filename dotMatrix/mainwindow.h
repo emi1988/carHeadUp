@@ -31,9 +31,9 @@ private slots:
     void on_pushButton_clicked();
 
     void displayNumber(int number);
+    void gpsSpeedReceived(int speed);
 
     void on_lineEditNumber_returnPressed();
-
     void on_horizontalSlider_sliderMoved(int position);
 
 private:

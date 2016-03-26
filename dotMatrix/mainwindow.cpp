@@ -1,5 +1,6 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
+#include "gpsmanager.h"
 
 //#include <stdint.h>
 //#include <stdio.h>
@@ -30,62 +31,19 @@ MainWindow::MainWindow(QWidget *parent) :
 {
     ui->setupUi(this);
 
+    if (wiringPiSPISetup(CHANNEL, 1000000) < 0) {
+        fprintf (stderr, "SPI Setup failed: %s\n", strerror (errno));
+        exit(errno);
+    }
+
     //init the font for displaying the numbers
     initFont();
-    //matrix init
     matrixInit();
-
-//    uint8_t on[] = { 0xFF, 0xFF };
-//    uint8_t off[] = { 0xFF, 0x00 };
-//    uint8_t buf[2];
-
-    if (wiringPiSPISetup(CHANNEL, 1000000) < 0) {
-            fprintf (stderr, "SPI Setup failed: %s\n", strerror (errno));
-            exit(errno);
-        }
-
-//    //matrix init
-//    uint8_t initSettings[] = { MAX7219_REG_SCANLIMIT, 0x07 , MAX7219_REG_DECODEMODE, 0x00 , MAX7219_REG_DISPLAYTEST, 0x00, MAX7219_REG_SHUTDOWN, 0x01};
-//    memcpy(buf, initSettings ,8);
-    //    wiringPiSPIDataRW(CHANNEL, buf, 8);
-
-
-
     clear();
 
+    gpsManager *myGpsManager= new gpsManager(1);
 
-//    spi(8, binToDec("0101") );
-//    spi(7, binToDec("1011") );
-//    spi(6, binToDec("1101") );
-
-    //    spi(0x0B,0x07);
-//    spi(0x09,0x00);
-//    spi(0x0C,0x00);
-//    spi(0x0A,0xFF);
-//    spi(0x0C,0x01);
-//    spi(0xFF, 0xFF);
-//    spi(0xFF, 0x00);
-
-//    spi(1,0xFF);
-//    spi(2,2);
-//    spi(3,3);
-//    spi(4,4);
-//    spi(5,5);
-//    spi(6,6);
-//    spi(7,7);
-//    spi(8,9);
-
-
-
-
-//    for (;;) {
-//            memcpy(buf, on, 2);
-//            wiringPiSPIDataRW(CHANNEL, buf, 2);
-//            sleep(1);
-//            memcpy(buf, off, 2);
-//            wiringPiSPIDataRW(CHANNEL, buf, 2);
-//            sleep(1);
-//        }
+    connect(myGpsManager, SIGNAL(speedAviable(int)), this, SLOT(gpsSpeedReceived(int)));
 
 }
 
@@ -235,7 +193,7 @@ void MainWindow::on_pushButton_clicked()
 void MainWindow::displayNumber(int number)
 {
 
-    if(number>=10 & number<100)
+    if((number>=10) & (number<100))
     {
          int number1 = QString::number(number).left(1).toInt();
          int number2 = QString::number(number).right(1).toInt();
@@ -264,6 +222,13 @@ void MainWindow::displayNumber(int number)
     {
         //not implemented jet; waiting for second dot-matrix :)
     }
+
+}
+
+void MainWindow::gpsSpeedReceived(int speed)
+{
+
+    displayNumber(speed);
 
 }
 
