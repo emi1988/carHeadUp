@@ -208,7 +208,7 @@ void MainWindow::displayNumber(int number)
          spi(4, binToDec(currentBinaryNumber1.at(4)+"0" +currentBinaryNumber2.at(4)));
 
     }
-    else if (number<10)
+    else if ((number<10)& (number>=0))
     {
         QStringList currentBinaryNumber = m_numberHash.value(number);
 
@@ -221,6 +221,11 @@ void MainWindow::displayNumber(int number)
     else if(number >=100)
     {
         //not implemented jet; waiting for second dot-matrix :)
+    }
+    else if(number <0)
+    {
+        //error occured, so clear display
+        clear();
     }
 
 }

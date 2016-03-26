@@ -6,6 +6,8 @@
 #include <QDir>
 #include <QTimer>
 
+
+
 gpsManager::gpsManager(int secondsBetweenData)
 {
     m_secondsBetweenData = secondsBetweenData;
@@ -15,18 +17,34 @@ gpsManager::gpsManager(int secondsBetweenData)
     m_serialPort = new QSerialPort(this);
 
       //connect to gps-receiver
-      if(getSerialPortSettings() == true)
-      {
-          //gps receiver found, so open serial port
-          openSerialPort();
-          connect(m_serialPort, SIGNAL(readyRead()), this, SLOT(serialDataReceived()));
-          connect(m_serialPort, SIGNAL(error(QSerialPort::SerialPortError)), this, SLOT(handleError(QSerialPort::SerialPortError)));
-
-      }
-
+      connectToGpsReceiver();
 
 }
 
+void gpsManager::connectToGpsReceiver()
+{
+    if(getSerialPortSettings() == true)
+    {
+        //gps receiver found, so open serial port
+        bool connected = openSerialPort();
+        if(connected == true)
+        {
+            connect(m_serialPort, SIGNAL(readyRead()), this, SLOT(serialDataReceived()));
+            connect(m_serialPort, SIGNAL(error(QSerialPort::SerialPortError)), this, SLOT(handleError(QSerialPort::SerialPortError)));
+        }
+        else
+        {
+            //try to reconnect in 0,8 seconds
+             QTimer::singleShot(800, this, SLOT(reConnectToGpsReceiver()));
+        }
+
+    }
+    else
+    {
+        //try to reconnect in 0,8 seconds
+         QTimer::singleShot(800, this, SLOT(reConnectToGpsReceiver()));
+    }
+}
 
 bool gpsManager::getSerialPortSettings()
 {
@@ -95,6 +113,15 @@ bool gpsManager::openSerialPort()
 void gpsManager::handleError(QSerialPort::SerialPortError error)
 {
     qDebug() << "QSerialPort Error Number" << error;
+
+    //disconnect(m_serialPort, SIGNAL(error(QSerialPort::SerialPortError)), this, SLOT(handleError(QSerialPort::SerialPortError)));
+    //delete m_serialPort;
+    m_serialPort = new QSerialPort(this);
+    //connect(m_serialPort, SIGNAL(error(QSerialPort::SerialPortError)), this, SLOT(handleError(QSerialPort::SerialPortError)));
+
+    emit speedAviable(-1);
+
+    connectToGpsReceiver();
 }
 
 void gpsManager::serialDataReceived()
@@ -163,4 +190,9 @@ void gpsManager::serialDataReceived()
 
     //qDebug() << currentGPSsentences;
 
+}
+
+void gpsManager::reConnectToGpsReceiver()
+{
+    connectToGpsReceiver();
 }

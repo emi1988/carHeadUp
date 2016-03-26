@@ -12,6 +12,7 @@ class gpsManager :public QObject
 public:
     gpsManager( int secondsBetweenData = 1);
 
+    void connectToGpsReceiver();
 private:
     QSerialPort *m_serialPort;
     stSerialPortSettings m_currentPortSettings;
@@ -31,6 +32,7 @@ signals:
     private slots:
     void handleError(QSerialPort::SerialPortError error);
     void serialDataReceived();
+    void reConnectToGpsReceiver();
 };
 
 #endif // GPSMANAGER_H
