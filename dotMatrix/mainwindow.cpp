@@ -23,6 +23,7 @@ void MainWindow::matrixInit()
     spi(MAX7219_REG_DECODEMODE, 0);   // use matrix (not digits)
     spi(MAX7219_REG_DISPLAYTEST, 0);  // no display test
     spi(MAX7219_REG_SHUTDOWN, 1);
+    spi(MAX7219_REG_INTENSITY, 15);
 }
 
 MainWindow::MainWindow(QWidget *parent) :
