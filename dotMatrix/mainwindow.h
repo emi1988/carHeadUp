@@ -26,6 +26,7 @@ public:
     ~MainWindow();
 
     void matrixInit();
+    QStringList rotateFont(QStringList tmpNumber);
 private slots:
     void on_lineEditValue_returnPressed();
     void on_pushButton_clicked();
@@ -38,13 +39,14 @@ private slots:
 
 private:
     Ui::MainWindow *ui;
-    void spi(uint8_t reg, uint8_t val);
+    void spiRegVal(uint8_t reg, uint8_t val, int matrix);
+
     void clear();
     int binToDec(QString bin);
     void initFont();
 
-
     QHash<int, QStringList> m_numberHash;
+    int m_numberOfMatrices;
 };
 
 #endif // MAINWINDOW_H
